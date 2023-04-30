@@ -2,6 +2,8 @@ const axios  = require("axios");
 const express = require("express")
 const {MongoClient} = require('mongodb')
 const { ObjectId } = require('mongodb');
+const cors = require('cors');
+
 const client = new MongoClient('mongodb+srv://qwerty:qwerty123@cluster0.dmretu6.mongodb.net/?retryWrites=true&w=majority')
 
 const app = express();
@@ -22,11 +24,7 @@ connectDB().then(() => {
 
 
 
-app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-  });
+app.use(cors());
 
 
   app.get('/todolist', async (req, res) => {
@@ -50,6 +48,22 @@ app.post('/biba', async (req, res) => {
         res.status(200).json({ message: 'Данные успешно сохранены' });
       }
     });
+  });
+
+app.put('/todolists/:id', async (req, res) => {
+    const {id} = req.params
+    const {post} = req.body;
+    // const id = post._id;
+    const model = client.db().collection('todo');
+    // await model.findOneAndUpdate(
+    //     { _id: id},
+    //     {$set: {post}}
+    // );
+    console.log(req.body)
+    console.log(post)
+    // Здесь может быть логика обновления поста
+  
+    // res.send(`Post ${postId} updated successfully.`);
   });
 
 app.listen(3001, () => {
