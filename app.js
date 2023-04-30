@@ -28,6 +28,15 @@ app.use(function(req, res, next) {
     next();
   });
 
+
+  app.get('/todolist', async (req, res) => {
+    const model = client.db().collection('todo');
+    const todolist = await model.find().toArray();
+    res.json(todolist);
+  });
+
+
+
 app.post('/biba', async (req, res) => {
     const data = { ...req.body, _id: new ObjectId() };
     const model = await client.db().collection('todo');
