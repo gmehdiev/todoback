@@ -1,7 +1,7 @@
 const axios  = require("axios");
 const express = require("express")
 const {MongoClient} = require('mongodb')
-const { ObjectId } = require('mongodb');
+const ObjectId = require('mongodb').ObjectId;
 const cors = require('cors');
 
 const client = new MongoClient('mongodb+srv://qwerty:qwerty123@cluster0.dmretu6.mongodb.net/?retryWrites=true&w=majority')
@@ -24,7 +24,10 @@ connectDB().then(() => {
 
 
 
-app.use(cors());
+app.use(cors({
+    origin: '*',
+    
+  }));
 
 
   app.get('/todolist', async (req, res) => {
@@ -50,21 +53,34 @@ app.post('/biba', async (req, res) => {
     });
   });
 
-app.put('/todolists/:id', async (req, res) => {
+  app.patch('/todolists/:id', async (req, res) => {
     const {id} = req.params
-    const {post} = req.body;
+    const {_id, ...post} = req.body; 
+    const objectId = new ObjectId(id);
     // const id = post._id;
     const model = client.db().collection('todo');
-    // await model.findOneAndUpdate(
-    //     { _id: id},
-    //     {$set: {post}}
-    // );
-    console.log(req.body)
-    console.log(post)
+    
+    const updatedModel = await model.findOneAndUpdate(
+        { _id: objectId },
+        { $set: { ...post } },
+        { returnOriginal: false }
+      );
+    console.log(id)
+    console.log({...post})
     // Здесь может быть логика обновления поста
   
     // res.send(`Post ${postId} updated successfully.`);
+    return res.status(200).json(updatedModel)
   });
+
+
+//   app.delete('/todolists/:id', async (req, res) => {
+//     const id = new ObjectId(req.params.id);
+//     const model = client.db().collection('todo');
+//     await model.deleteOne({ _id: ObjectId(id) });
+//     res.status(204).send();
+//   });
+
 
 app.listen(3001, () => {
 console.log('Server is listening on port 3001!')
